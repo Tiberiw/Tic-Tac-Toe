@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'Outfit';
+    src: url(./fonts/Outfit-Medium.ttf);
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 10px;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Outfit', sans-serif;
+}

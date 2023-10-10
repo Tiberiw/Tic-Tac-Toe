@@ -11,6 +11,24 @@ const playerFactory = (name, sign) => {
 /* Gamelogic Module */
 const Gamelogic = (function(){
 
+
+    /* Node for the turn text field */
+    const displayTurnField = document.querySelector('.turn');
+
+    /* Reset Game Button */
+    const resetButton = document.querySelector('button.reset');
+
+    /* Dialog window */
+    const dialogWindow = document.querySelector('dialog');
+
+    /* Replay button */
+    const replayButton = document.querySelector('button.play-again');
+
+    /* Restul div */
+    const resultDiv = document.querySelector('div.result');
+
+    
+
     /* GET  The 2 players. In the future input their names */
     const player1 = playerFactory("Player1", "X");
     const player2 = playerFactory("Player2", "O");
@@ -96,14 +114,19 @@ const Gamelogic = (function(){
     
     })();
 
-    /* Node for the turn text field */
-    const displayTurnField = document.querySelector('.turn');
-
-    /* Reset Game Button */
-    const resetButton = document.querySelector('button.reset');
     resetButton.addEventListener('click', () => {
         reset();
     });
+
+    replayButton.addEventListener('click', () => {
+        dialogWindow.close();
+        reset();
+    })
+
+    const displayModal = (string) => {
+        dialogWindow.showModal();
+        resultDiv.textContent = string;
+    }
 
     /* Change Current Player */
     const changePlayer = () => {
@@ -120,12 +143,16 @@ const Gamelogic = (function(){
 
     /* Display Winner */
     const displayWinner = (winner) => {
-        displayTurnField.textContent = `${winner.getName()} won!`;
+        const string = `${winner.getName()} won!`
+        displayTurnField.textContent = string;
+        displayModal(string);
     }
 
     /* Display Draw */
     const displayDraw = () => {
-        displayTurnField.textContent = "It's a draw!";
+        const string = "It's a draw!"
+        displayTurnField.textContent = string;
+        displayModal(string);
     }
 
 

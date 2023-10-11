@@ -7,18 +7,35 @@
         <link rel="stylesheet" href="./styles.css">
     </head>
     <body>
-        <h1>Tic Tac Toe</h1>
-        <button class="reset">RESET</button>
+        <div class="header">
+            <h1><span class="X">X</span><span class="O"> O</span></h1>
+            <div class="turn"></div>
+            <button class="home"><img src="./images/home.svg" alt="home icon"></button>
+        </div>
+        
         <div class="content">
             <div class="board">
 
             </div>
+            <button class="reset"><img src="./images/reload.svg" alt="reload icon"></button>
+
+            <div class="getNames">
+                <form action="#" class="input-names">
+                    <div class="playerx">
+                        <input type="text" id="playerx" name="playerx" required>
+                        <label for="playero">Player <span class="X">X</span>:</label>
+                    </div>
+                    <div class="playero">
+                        <input type="text" id="playero" name="playero" required>
+                        <label for="playero">Player <span class="O">O</span>:</label>
+                    </div>
+                    <button type="submit" class="input-names">PLAY</button>
+                </form>
+            </div>
+            <div class="input-game">
+                <button class="vs-ai"><img src="./images/robot.svg" alt="robot icon">vs A.I.</button>
+                <button class="vs-player"><img src="./images/player.svg" alt="player icon">vs Player</button>
+            </div>
         </div>
-        <div class="turn"></div>
-        <dialog>
-            <div class="result"></div>
-            <button class="play-again">PLAY AGAIN</button>
-            <button class="back-to-menu">BACK TO MENU</button>
-        </dialog>
     </body>
 </html>

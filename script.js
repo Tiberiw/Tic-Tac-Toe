@@ -2,36 +2,29 @@
 /* Player Factory Function */
 const playerFactory = (name, sign) => {
 
-    const getName = () => name;
+    let playerNa = name
+    const getName = () => playerNa;
     const getSign = () => sign;
+    const setName = (newName) => { playerNa = newName};
 
-    return {getName, getSign};
+    return {getName, getSign, setName};
 }
 
 /* Gamelogic Module */
 const Gamelogic = (function(){
 
-
+    let gameMode = "normal";
     /* Node for the turn text field */
     const displayTurnField = document.querySelector('.turn');
 
+    const homeButton = document.querySelector('button.home');
+
     /* Reset Game Button */
-    const resetButton = document.querySelector('button.reset');
-
-    /* Dialog window */
-    const dialogWindow = document.querySelector('dialog');
-
-    /* Replay button */
-    const replayButton = document.querySelector('button.play-again');
-
-    /* Restul div */
-    const resultDiv = document.querySelector('div.result');
-
-    
+    const resetButton = document.querySelector('button.reset');     
 
     /* GET  The 2 players. In the future input their names */
-    const player1 = playerFactory("Player1", "X");
-    const player2 = playerFactory("Player2", "O");
+    const player1 = playerFactory("PlayerX", "X");
+    const player2 = playerFactory("PlayerO", "O");
 
     /* Refference to the current player */
     let currentPlayer = player1;
@@ -39,6 +32,98 @@ const Gamelogic = (function(){
     /* Play Status and Rounds Played */
     let play = true;
     let roundsPlayed = 0;
+
+
+    const sendButton = document.querySelector('button[type="submit"]');
+    const divInput = document.querySelector('div.getNames');
+    const divGameType = document.querySelector('div.input-game');
+    const aiButton = document.querySelector('button.vs-ai');
+    const playerButton = document.querySelector('button.vs-player');
+
+    const inputNames = () => {
+
+        displayTurnField.textContent = "Choose names:"
+        Gameboard.boardContainer.style.display = "none";
+        divInput.style.display = "flex";
+        document.querySelector('input#playerx').value = "";
+        document.querySelector('input#playero').value = "";
+        sendButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let playerXName = document.querySelector('input#playerx').value;
+            let playerOName = document.querySelector('input#playero').value;
+
+            if(playerXName == "")
+                playerXName = "X";
+            if(playerOName == "")
+                playerOName = "O";
+
+            player1.setName(playerXName);
+            player2.setName(playerOName);
+
+            divInput.style.display = "none";
+            Gameboard.boardContainer.style.display = "grid";
+            resetButton.style.display = "inline";
+            
+            init();
+        });
+    }
+
+    const inputNamesAI = () => {
+        displayTurnField.textContent = "Choose your name:"
+        Gameboard.boardContainer.style.display = "none";
+        divInput.style.display = "flex";
+
+        let userInput = document.querySelector('input#playerx')
+        userInput.value = "";
+        let aiInput = document.querySelector('input#playero')
+        aiInput.value = "A.I.";
+        /* BAAA */
+        // document.querySelector('label#playero').style.display = "none"
+        // aiInput.style.display = "none";
+
+
+        sendButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let playerXName = document.querySelector('input#playerx').value;
+            let playerOName = "A.I.";
+
+            if(playerXName == "")
+                playerXName = "X";
+            if(playerOName == "")
+                playerOName = "O";
+
+            player1.setName(playerXName);
+            player2.setName(playerOName);
+
+            divInput.style.display = "none";
+            Gameboard.boardContainer.style.display = "grid";
+            resetButton.style.display = "inline";
+            
+            init();
+        });
+
+
+    }
+
+    const inputGameType = () => {
+        divGameType.style.display = "grid";
+        resetButton.style.display = "none";
+        displayTurnField.textContent = "Choose Game Type:"
+        divInput.style.display = "none";
+        Gameboard.boardContainer.style.display = "none";
+
+        aiButton.addEventListener('click', () => {
+            divGameType.style.display = "none";
+            gameMode = "A.I.";
+            inputNamesAI();
+        });
+
+        playerButton.addEventListener('click', () => {
+            divGameType.style.display = "none";
+            gameMode = "normal";
+            inputNames();
+        });
+    }
 
     /* Gameboard Module */
     const Gameboard = (function(){
@@ -48,7 +133,7 @@ const Gamelogic = (function(){
 
         /* Initialise the board */
         const initBoard = () => {
-    
+                boardContainer.innerHTML = "";
                 board.splice(0, board.length);
 
                 for(let i = 0; i < 3; i++) 
@@ -106,11 +191,11 @@ const Gamelogic = (function(){
     
         /* i*3 + j */
         /*Setters and Getters */
-        const setCellSign = (row,column,sign) => { board[row*3 + column].textContent = sign };
+        const setCellSign = (row,column,sign) => { board[row*3 + column].textContent = sign; board[row*3 + column].classList.add(sign) ; };
     
         const getCellSign = (row,column) => board[row*3 + column].textContent;
     
-        return {setCellSign, getCellSign, board, initBoard, checkStatus};
+        return {setCellSign, getCellSign, board, initBoard, checkStatus, boardContainer};
     
     })();
 
@@ -118,15 +203,6 @@ const Gamelogic = (function(){
         reset();
     });
 
-    replayButton.addEventListener('click', () => {
-        dialogWindow.close();
-        reset();
-    })
-
-    const displayModal = (string) => {
-        dialogWindow.showModal();
-        resultDiv.textContent = string;
-    }
 
     /* Change Current Player */
     const changePlayer = () => {
@@ -145,23 +221,23 @@ const Gamelogic = (function(){
     const displayWinner = (winner) => {
         const string = `${winner.getName()} won!`
         displayTurnField.textContent = string;
-        displayModal(string);
     }
 
     /* Display Draw */
     const displayDraw = () => {
         const string = "It's a draw!"
         displayTurnField.textContent = string;
-        displayModal(string);
     }
 
 
     /* Initialise Game Logic */
     const init = () => {
+        
         Gameboard.initBoard();
         displayTurn();
         Gameboard.board.forEach( (cell) => {
             cell.addEventListener('click', () => {
+
                 if(Gameboard.getCellSign(Number(cell.getAttribute("data-row")), Number(cell.getAttribute("data-column"))) === "" && play) {
 
                     /* Set the Board Coresponding to the Right Player */
@@ -191,14 +267,27 @@ const Gamelogic = (function(){
         displayTurn();
         Gameboard.board.forEach( (cell) => {
             cell.textContent = "";
+            cell.classList.remove("O");
+            cell.classList.remove("X");
         })
         roundsPlayed = 0;
         play = true;
     }
 
-    return {init};
+    const run = () => {
+       
+        homeButton.addEventListener('click', () => {
+            reset();
+            Gameboard.boardContainer.innerHTML = "";
+            inputGameType();
+        });
+        inputGameType();
+    }
+
+
+    return {run};
 
 })()
 
-Gamelogic.init();
+Gamelogic.run();
 

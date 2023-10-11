@@ -6,27 +6,226 @@
 html {
     box-sizing: border-box;
     font-size: 10px;
+    height: 100%;
 }
 
 *, *::before, *::after {
     box-sizing: inherit;
 }
 
+:root {
+    --purple: #802BB1;
+    --black: #2D283E;
+    --light-gray: #564F6F;
+    --dark-gray: #4C495D;
+    --white: #D1D7E0;
+    --turq: #3AAFA9; 
+    --red-button: #ff0000;
+    --green-button: #adff2f;
+}
+
 body {
     margin: 0px;
     padding: 0px;
     font-family: 'Outfit', sans-serif;
+    background-color: var(--black);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+    >h1 {
+        >.X {
+            color: var(--purple);
+        }
+        >.O {
+            color: var(--turq);
+        }
+        font-size: 6rem;
+    }
+    >button {
+        border-style: none;
+        outline: none;
+        background-color: transparent;
+        
+        border-radius: 8px;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+        >img {
+            width: 70px;
+            height: auto;
+        }
+    }
+    >div {
+        color: var(--white);
+        font-size: 5rem;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    >button {
+        position: absolute; 
+        right: 14vw;
+        display: inline;
+
+        border-style: none;
+        outline: none;
+        background-color: transparent;
+        
+        border-radius: 8px;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+        >img {
+            width: 70px;
+            height: auto;
+        }
+    }
 }
 
 
+
+
 .board {
-    width: 400px;
-    height: 400px;
+    width: 25vw;
+    height: 25vw;
     display: grid;
     grid-template-columns: repeat(3,1fr);
     grid-template-rows: repeat(3,1fr);
-    border: 1px solid black;
+    gap: 10px;
     >div {
-        border: 1px solid black;
+        border: 4px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--purple);
+        font-weight: bold;
+        font-size: 7.75em;
+    }
+    >div.O {
+        color: var(--turq);
+    }
+    >div:nth-child(1) {
+        border-top: none;
+        border-left: none;
+    }
+    >div:nth-child(2) {
+        border-top: none;
+        
+    }
+    >div:nth-child(3) {
+        border-right: none;
+        border-top: none;
+    }
+    >div:nth-child(4) {
+        border-left: none;
+    }
+    >div:nth-child(6) {
+        border-right: none;
+    }
+    >div:nth-child(7) {
+        border-left: none;
+        border-bottom: none;
+    }
+    >div:nth-child(8) {
+        border-bottom: none;
+    }
+    >div:nth-child(9) {
+        border-bottom: none;
+        border-right: none;
+    }
+}
+
+
+.getNames {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    >form {
+        display: grid;
+        grid-template: auto auto / auto auto;
+        gap: 10vw;
+        >button {
+            grid-column: 1 / 3;
+            justify-self: center;
+            background-color: var(--dark-gray);
+            color: var(--white);
+            padding: 8px 16px;
+            border-style: none;
+            outline: none;
+            /* width: clamp(30px,3.5vw ,80px); */
+            border-radius: 8px;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            font-size: clamp(1.5rem, 5vw,3rem);
+            cursor: pointer;
+        }
+        >button:hover,
+        >button:focus {
+            background-color: var(--red-button);
+        }
+
+        >div {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            >input {
+                background-color: var(--dark-gray);
+                color: var(--white);
+                font-size: clamp(1.5rem, 5vw,3rem);
+                padding: 8px 16px;
+                border: 3px solid var(--light-gray);
+                border-radius: 8px;
+            }
+            >input#playerx:focus {
+                outline: none;
+                border: 5px solid var(--purple);
+                ~ label {
+                    color: var(--purple);
+                }
+            }
+            >input#playero:focus {
+                outline: none;
+                border: 5px solid var(--turq);
+                ~ label {
+                    color: var(--turq);
+                }
+            }
+            >label {
+                color: var(--light-gray);
+                font-size: 4rem;
+            }
+           
+        }
+    }
+}
+
+.input-game {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 5vw;
+    >button {
+        width: 20vw;
+        font-weight: bold;
+        font-size: 5rem;
+        color: var(--light-gray);
+        padding: 16px 24px;
+    }
+
+    >button.vs-ai {
+        background-color: var(--red-button);
+    }
+
+    >button.vs-player {
+        background-color: var(--green-button);
     }
 }

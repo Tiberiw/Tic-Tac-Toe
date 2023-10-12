@@ -7,3 +7,5 @@ Tic Tac Toe Game
 -Player vs Player and Player vs Computer
 
 -Implemented A.I. algorithm for Computer
+
+Live demo: https://tiberiw.github.io/Tic-Tac-Toe/

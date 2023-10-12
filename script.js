@@ -191,17 +191,123 @@ const Gamelogic = (function(){
     
         /* i*3 + j */
         /*Setters and Getters */
-        const setCellSign = (row,column,sign) => { board[row*3 + column].textContent = sign; board[row*3 + column].classList.add(sign) ; };
+        const setCellSign = (row,column,sign) => { board[row*3 + column].textContent = sign; board[row*3 + column].classList.add(sign); };
     
+        const setCellSignIndex = (index,sign) => { board[index].textContent = sign; board[index].classList.add(sign); }
+
         const getCellSign = (row,column) => board[row*3 + column].textContent;
+
+        const getCellSignIndex = (index) => board[index].textContent;
     
-        return {setCellSign, getCellSign, board, initBoard, checkStatus, boardContainer};
+        return {setCellSign, getCellSign, board, initBoard, checkStatus, boardContainer, setCellSignIndex, getCellSignIndex};
     
     })();
 
     resetButton.addEventListener('click', () => {
         reset();
     });
+
+    const aiBrain = (function() {
+
+        let origBoard = []
+        let humanPlayer;
+        let aiPlayer;
+        const initAiBoard = () => {
+            origBoard.splice(0,origBoard.length);
+            for(let i = 0; i < 9; i++)
+                origBoard.push(i);
+            if(player1.getName() === "A.I.")
+                aiPlayer = player1.getSign(), humanPlayer = player2.getSign();
+            else
+                aiPlayer = player2.getSign(), humanPlayer = player1.getSign();
+        }
+
+        function emptyIndexies (board) {
+            return board.filter( s => s != "O" && s != "X");  
+        }
+
+        function winning(board, player) {
+            if(
+                (board[0] == player && board[1] == player && board[2] == player) ||
+                (board[3] == player && board[4] == player && board[5] == player) ||
+                (board[6] == player && board[7] == player && board[8] == player) ||
+                (board[0] == player && board[3] == player && board[6] == player) ||
+                (board[1] == player && board[4] == player && board[7] == player) ||
+                (board[2] == player && board[5] == player && board[8] == player) ||
+                (board[0] == player && board[4] == player && board[8] == player) ||
+                (board[2] == player && board[4] == player && board[6] == player)
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function minimax(newBoard, player) {
+
+            let availSpots = emptyIndexies(newBoard);
+
+            if(winning(newBoard,aiPlayer)) {
+                return {score:10};
+            } else if(winning(newBoard,humanPlayer)) {
+                return {score:-10};
+            } else if(availSpots.length === 0){
+                return {score:0};
+            }
+
+            let moves = [];
+
+            for(let i = 0; i < availSpots.length; i++) {
+                let move = {};
+
+                move.index = newBoard[availSpots[i]];
+
+                newBoard[availSpots[i]] = player;
+
+
+                if(player == aiPlayer) {
+                    let result = minimax(newBoard,humanPlayer);
+                    move.score = result.score;
+                }
+                else {
+                    let result = minimax(newBoard,aiPlayer);
+                    move.score = result.score;
+                }
+    
+    
+                newBoard[availSpots[i]] = move.index;
+    
+                moves.push(move);
+
+            }
+                
+           
+
+
+            let bestMove;
+            if(player === aiPlayer) {
+                let bestScore = -100000;
+                for(let i = 0; i < moves.length; i++) {
+                    if(bestScore < moves[i].score) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                        
+                }
+            }else {
+                let bestScore = 100000;
+                for(let i = 0; i < moves.length; i++) {
+                    if(bestScore > moves[i].score) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            }
+            return moves[bestMove];
+        }
+
+        return {initAiBoard, minimax, origBoard};
+    })();
 
 
     /* Change Current Player */
@@ -235,14 +341,24 @@ const Gamelogic = (function(){
         
         Gameboard.initBoard();
         displayTurn();
+        if(gameMode === "A.I.") {
+            aiBrain.initAiBoard();
+        }
         Gameboard.board.forEach( (cell) => {
             cell.addEventListener('click', () => {
+
+                
 
                 if(Gameboard.getCellSign(Number(cell.getAttribute("data-row")), Number(cell.getAttribute("data-column"))) === "" && play) {
 
                     /* Set the Board Coresponding to the Right Player */
                     Gameboard.setCellSign(Number(cell.getAttribute("data-row")), Number(cell.getAttribute("data-column")) , currentPlayer.getSign());
                     
+                    let row = Number(cell.getAttribute("data-row"));
+                    let column = Number(cell.getAttribute("data-column"));
+
+                    aiBrain.origBoard[row*3 + column] = currentPlayer.getSign(); 
+
                     if(++roundsPlayed >= 5 && Gameboard.checkStatus()) {
                         displayWinner(currentPlayer);
                         play = false;
@@ -252,6 +368,29 @@ const Gamelogic = (function(){
                     } else {
                         changePlayer();
                         displayTurn();
+                        if(gameMode === "A.I.") {
+                            if(currentPlayer.getName() === "A.I.") {
+                                
+                                let move = aiBrain.minimax(aiBrain.origBoard, currentPlayer.getSign());
+                                let index = move.index;
+                                Gameboard.setCellSignIndex(index, currentPlayer.getSign());
+                                aiBrain.origBoard[index] = currentPlayer.getSign();
+                                
+                                if(++roundsPlayed >= 5 && Gameboard.checkStatus()) {
+                                    displayWinner(currentPlayer);
+                                    play = false;
+                                } else if(roundsPlayed === 9) {
+                                    displayDraw();
+                                    play = false;
+                                } else {
+                                    changePlayer();
+                                    displayTurn();
+                                }
+                            } 
+                        
+                        }
+
+                        
                     }
                     
                     
@@ -259,6 +398,7 @@ const Gamelogic = (function(){
              
             });
         });
+
     }
 
     /* Reset / Restart Game */
@@ -272,6 +412,10 @@ const Gamelogic = (function(){
         })
         roundsPlayed = 0;
         play = true;
+        if(gameMode === "A.I.") {
+            console.log("VAA")
+            aiBrain.initAiBoard();
+        }
     }
 
     const run = () => {
@@ -285,7 +429,7 @@ const Gamelogic = (function(){
     }
 
 
-    return {run};
+    return {run,aiBrain};
 
 })()
 
